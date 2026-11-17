@@ -83,6 +83,13 @@ include heatshrink/heatshrink.mk
 
 # Define linker script file here
 LDSCRIPT= ld_bootloader.ld
+
+# GigaDevice GD32F405xK 3 MB layout (for VESC firmware built from the bldc
+# gd32 branch, boards named *_gd32). Usage: make GD32=1 build_args='-DHW_VER=60'
+ifeq ($(GD32),1)
+  LDSCRIPT = ld_bootloader_gd32.ld
+  USE_OPT += -DGD32F405_COMPAT
+endif
 #LDSCRIPT= $(PORTLD)/STM32F407xG.ld
 #LDSCRIPT= $(PORTLD)/STM32F407xG_CCM.ld
 

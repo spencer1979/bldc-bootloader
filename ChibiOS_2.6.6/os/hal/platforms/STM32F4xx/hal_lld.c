@@ -169,6 +169,20 @@ void stm32_clock_init(void) {
   RCC->CR |= RCC_CR_HSION;                  /* Make sure HSI is ON.         */
   while (!(RCC->CR & RCC_CR_HSIRDY))
     ;                                       /* Wait until HSI is stable.    */
+#if defined(GD32F405_COMPAT)
+  /* GD32F4xx (migration note 5.2): when entered from the application the
+     core still runs from the PLL. Divide HCLK by 4, wait, and switch to
+     IRC16M before the PLL is turned off below.*/
+  if ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_HSI) {
+    volatile uint32_t gd32_delay;
+    RCC->CFGR |= RCC_CFGR_HPRE_DIV4;
+    for (gd32_delay = 0xFFFF; gd32_delay > 0; gd32_delay--)
+      ;
+    RCC->CFGR &= ~RCC_CFGR_SW;
+    while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_HSI)
+      ;
+  }
+#endif
   RCC->CR &= RCC_CR_HSITRIM | RCC_CR_HSION; /* CR Reset value.              */
   RCC->CFGR = 0;                            /* CFGR reset value.            */
   while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_HSI)

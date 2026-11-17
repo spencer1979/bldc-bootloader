@@ -31,6 +31,7 @@
 /*
  * Defines
  */
+#ifndef GD32F405_COMPAT
 #define FLASH_SECTORS			12
 #define BOOTLOADER_BASE			11
 #define APP_BASE				0
@@ -38,6 +39,22 @@
 #define NEW_APP_BASE			8
 #define NEW_APP_SECTORS			3
 #define NEW_APP_MAX_SIZE		(3 * (1 << 17))
+#else
+/*
+ * GigaDevice GD32F405xK (3 MB) layout, must match flash_helper.c of the
+ * VESC firmware built with GD32F405_COMPAT (bldc branch gd32):
+ *  s0-s11  0x08000000 1 MB   application image (incl. EEPROM s1-s2)
+ *  s12-s15 0x08100000 64 KB  this bootloader
+ *  s24-s27 0x08200000 1 MB   new app staging (6 byte header + image)
+ */
+#define FLASH_SECTORS			28
+#define BOOTLOADER_BASE			12
+#define APP_BASE				0
+#define APP_SECTORS				12
+#define NEW_APP_BASE			24
+#define NEW_APP_SECTORS			4
+#define NEW_APP_MAX_SIZE		(4 * (1 << 18) - 6)
+#endif
 
 // Base address of the Flash sectors
 #define ADDR_FLASH_SECTOR_0     ((uint32_t)0x08000000) // Base @ of Sector 0, 16 Kbytes
@@ -52,6 +69,28 @@
 #define ADDR_FLASH_SECTOR_9     ((uint32_t)0x080A0000) // Base @ of Sector 9, 128 Kbytes
 #define ADDR_FLASH_SECTOR_10    ((uint32_t)0x080C0000) // Base @ of Sector 10, 128 Kbytes
 #define ADDR_FLASH_SECTOR_11    ((uint32_t)0x080E0000) // Base @ of Sector 11, 128 Kbytes
+
+#ifdef GD32F405_COMPAT
+#define ADDR_FLASH_SECTOR_12    ((uint32_t)0x08100000) // 16 Kbytes
+#define ADDR_FLASH_SECTOR_13    ((uint32_t)0x08104000) // 16 Kbytes
+#define ADDR_FLASH_SECTOR_14    ((uint32_t)0x08108000) // 16 Kbytes
+#define ADDR_FLASH_SECTOR_15    ((uint32_t)0x0810C000) // 16 Kbytes
+#define ADDR_FLASH_SECTOR_16    ((uint32_t)0x08110000) // 64 Kbytes
+#define ADDR_FLASH_SECTOR_17    ((uint32_t)0x08120000) // 128 Kbytes
+#define ADDR_FLASH_SECTOR_18    ((uint32_t)0x08140000) // 128 Kbytes
+#define ADDR_FLASH_SECTOR_19    ((uint32_t)0x08160000) // 128 Kbytes
+#define ADDR_FLASH_SECTOR_20    ((uint32_t)0x08180000) // 128 Kbytes
+#define ADDR_FLASH_SECTOR_21    ((uint32_t)0x081A0000) // 128 Kbytes
+#define ADDR_FLASH_SECTOR_22    ((uint32_t)0x081C0000) // 128 Kbytes
+#define ADDR_FLASH_SECTOR_23    ((uint32_t)0x081E0000) // 128 Kbytes
+#define ADDR_FLASH_SECTOR_24    ((uint32_t)0x08200000) // 256 Kbytes
+#define ADDR_FLASH_SECTOR_25    ((uint32_t)0x08240000) // 256 Kbytes
+#define ADDR_FLASH_SECTOR_26    ((uint32_t)0x08280000) // 256 Kbytes
+#define ADDR_FLASH_SECTOR_27    ((uint32_t)0x082C0000) // 256 Kbytes
+
+// GD32 FMC_CTL SN values: s12-s23 -> SN 16-27, s24-s27 -> SN 12-15
+#define GD32_FLASH_Sector(sn)   ((uint16_t)((sn) << 3))
+#endif
 
 #define ERASE_VOLTAGE_RANGE		(uint8_t)((PWR->CSR & PWR_CSR_PVDO) ? VoltageRange_2 : VoltageRange_3)
 
@@ -96,9 +135,17 @@ static const uint32_t flash_addr[FLASH_SECTORS] = {
 		ADDR_FLASH_SECTOR_8,
 		ADDR_FLASH_SECTOR_9,
 		ADDR_FLASH_SECTOR_10,
-		ADDR_FLASH_SECTOR_11
+		ADDR_FLASH_SECTOR_11,
+#ifdef GD32F405_COMPAT
+		ADDR_FLASH_SECTOR_12, ADDR_FLASH_SECTOR_13, ADDR_FLASH_SECTOR_14,
+		ADDR_FLASH_SECTOR_15, ADDR_FLASH_SECTOR_16, ADDR_FLASH_SECTOR_17,
+		ADDR_FLASH_SECTOR_18, ADDR_FLASH_SECTOR_19, ADDR_FLASH_SECTOR_20,
+		ADDR_FLASH_SECTOR_21, ADDR_FLASH_SECTOR_22, ADDR_FLASH_SECTOR_23,
+		ADDR_FLASH_SECTOR_24, ADDR_FLASH_SECTOR_25, ADDR_FLASH_SECTOR_26,
+		ADDR_FLASH_SECTOR_27,
+#endif
 };
-static const uint16_t flash_sector[12] = {
+static const uint16_t flash_sector[FLASH_SECTORS] = {
 		FLASH_Sector_0,
 		FLASH_Sector_1,
 		FLASH_Sector_2,
@@ -110,7 +157,15 @@ static const uint16_t flash_sector[12] = {
 		FLASH_Sector_8,
 		FLASH_Sector_9,
 		FLASH_Sector_10,
-		FLASH_Sector_11
+		FLASH_Sector_11,
+#ifdef GD32F405_COMPAT
+		GD32_FLASH_Sector(16), GD32_FLASH_Sector(17), GD32_FLASH_Sector(18),
+		GD32_FLASH_Sector(19), GD32_FLASH_Sector(20), GD32_FLASH_Sector(21),
+		GD32_FLASH_Sector(22), GD32_FLASH_Sector(23), GD32_FLASH_Sector(24),
+		GD32_FLASH_Sector(25), GD32_FLASH_Sector(26), GD32_FLASH_Sector(27),
+		GD32_FLASH_Sector(12), GD32_FLASH_Sector(13), GD32_FLASH_Sector(14),
+		GD32_FLASH_Sector(15),
+#endif
 };
 
 static heatshrink_decoder hsd;
