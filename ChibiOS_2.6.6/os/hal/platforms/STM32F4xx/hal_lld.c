@@ -251,7 +251,14 @@ void stm32_clock_init(void) {
               STM32_RTCPRE | STM32_PPRE2 | STM32_PPRE1 | STM32_HPRE;
 
   /* Flash setup.*/
-#if defined(STM32_USE_REVISION_A_FIX)
+#if defined(GD32F405_COMPAT)
+  /* GD32F4xx: FMC_WS (same address as FLASH_ACR) only implements
+     WSCNT[3:0], bits 31:4 are reserved (GD32F4xx User Manual Rev3.0,
+     2.4.1). There is no prefetch/I-cache/D-cache (ART), so PRFTEN/ICEN/DCEN
+     must not be written. WSCNT only takes effect when WSEN in FMC_WSEN is
+     set (2.4.10, reset value 0 = no wait states added).*/
+  FLASH->ACR = STM32_FLASHBITS;
+#elif defined(STM32_USE_REVISION_A_FIX)
   /* Some old revisions of F4x MCUs randomly crashes with compiler
      optimizations enabled AND flash caches enabled. */
   if ((DBGMCU->IDCODE == 0x20006411) && (SCB->CPUID == 0x410FC241))
