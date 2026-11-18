@@ -31,7 +31,7 @@
 /*
  * Defines
  */
-#ifndef GD32F405_COMPAT
+#ifndef GD32F405_FLASH_3M
 #define FLASH_SECTORS			12
 #define BOOTLOADER_BASE			11
 #define APP_BASE				0
@@ -42,7 +42,7 @@
 #else
 /*
  * GigaDevice GD32F405xK (3 MB) layout, must match flash_helper.c of the
- * VESC firmware built with GD32F405_COMPAT (bldc branch gd32):
+ * VESC firmware built with GD32F405_FLASH_3M (bldc branch gd32, fw_*_gd32):
  *  s0-s11  0x08000000 1 MB   application image (incl. EEPROM s1-s2)
  *  s12-s15 0x08100000 64 KB  this bootloader
  *  s24-s27 0x08200000 1 MB   new app staging (6 byte header + image)
@@ -70,7 +70,7 @@
 #define ADDR_FLASH_SECTOR_10    ((uint32_t)0x080C0000) // Base @ of Sector 10, 128 Kbytes
 #define ADDR_FLASH_SECTOR_11    ((uint32_t)0x080E0000) // Base @ of Sector 11, 128 Kbytes
 
-#ifdef GD32F405_COMPAT
+#ifdef GD32F405_FLASH_3M
 #define ADDR_FLASH_SECTOR_12    ((uint32_t)0x08100000) // 16 Kbytes
 #define ADDR_FLASH_SECTOR_13    ((uint32_t)0x08104000) // 16 Kbytes
 #define ADDR_FLASH_SECTOR_14    ((uint32_t)0x08108000) // 16 Kbytes
@@ -136,7 +136,7 @@ static const uint32_t flash_addr[FLASH_SECTORS] = {
 		ADDR_FLASH_SECTOR_9,
 		ADDR_FLASH_SECTOR_10,
 		ADDR_FLASH_SECTOR_11,
-#ifdef GD32F405_COMPAT
+#ifdef GD32F405_FLASH_3M
 		ADDR_FLASH_SECTOR_12, ADDR_FLASH_SECTOR_13, ADDR_FLASH_SECTOR_14,
 		ADDR_FLASH_SECTOR_15, ADDR_FLASH_SECTOR_16, ADDR_FLASH_SECTOR_17,
 		ADDR_FLASH_SECTOR_18, ADDR_FLASH_SECTOR_19, ADDR_FLASH_SECTOR_20,
@@ -158,7 +158,7 @@ static const uint16_t flash_sector[FLASH_SECTORS] = {
 		FLASH_Sector_9,
 		FLASH_Sector_10,
 		FLASH_Sector_11,
-#ifdef GD32F405_COMPAT
+#ifdef GD32F405_FLASH_3M
 		GD32_FLASH_Sector(16), GD32_FLASH_Sector(17), GD32_FLASH_Sector(18),
 		GD32_FLASH_Sector(19), GD32_FLASH_Sector(20), GD32_FLASH_Sector(21),
 		GD32_FLASH_Sector(22), GD32_FLASH_Sector(23), GD32_FLASH_Sector(24),

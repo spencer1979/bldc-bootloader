@@ -84,10 +84,22 @@ include heatshrink/heatshrink.mk
 # Define linker script file here
 LDSCRIPT= ld_bootloader.ld
 
-# GigaDevice GD32F405xK 3 MB layout (for VESC firmware built from the bldc
-# gd32 branch, boards named *_gd32). Usage: make GD32=1 build_args='-DHW_VER=60'
+# GigaDevice GD32F405xK (RKT6) 3 MB layout (for VESC firmware built from the
+# bldc gd32 branch, boards named *_gd32).
+# Usage: make GD32=1 build_args='-DHW_VER=60'
 ifeq ($(GD32),1)
   LDSCRIPT = ld_bootloader_gd32.ld
+  USE_OPT += -DGD32F405_COMPAT -DGD32F405_FLASH_3M
+endif
+
+# GigaDevice GD32F405RG (RGT6) 1 MB: stock STM32F405 layout and location
+# (0x080E0000), only the GD32 clock/flash workarounds are enabled (for VESC
+# firmware built from the bldc gd32 branch, boards named *_gd32_1m).
+# Usage: make GD32_1M=1 build_args='-DHW_VER=60'
+ifeq ($(GD32_1M),1)
+  ifeq ($(GD32),1)
+    $(error GD32=1 and GD32_1M=1 are mutually exclusive)
+  endif
   USE_OPT += -DGD32F405_COMPAT
 endif
 #LDSCRIPT= $(PORTLD)/STM32F407xG.ld
