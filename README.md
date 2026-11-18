@@ -22,3 +22,9 @@ GD32F405. Must be used together with firmware from the `gd32` branch of
 * Run `make clean` when switching between variants.
 * Flash with SWD: firmware `.bin` at 0x08000000, then this bootloader at
   the address above. Not verified on hardware yet.
+
+Boards without crystal: no special bootloader build is needed. The
+bootloader `mcuconf.h` always runs the PLL from the internal 16 MHz RC
+(HSE/LSE disabled, PLL M=16 N=336 P=2), so the `GD32=1` / `GD32_1M=1`
+bootloaders are used together with the `fw_*_gd32_nohse` /
+`fw_*_gd32_1m_nohse` firmware.
